@@ -55,19 +55,30 @@ class HashTable:
         # Part 2: Change this so that hash collisions are handled with Linked List Chaining.
 
         Fill this in.
-        '''
-            # what i did on my own 
+        ''' 
         index = self._hash_mod(key)
+        hash_ = self.storage
 
-        if self.storage[index] is not None:
-            print('key in user')
-            node = self.storage[index]
-            while node.next:
-                node = node.next
-
-            node.next = LinkedPair(key,value)
+        if hash_[index] is not None:
+            new_hash = LinkedPair(key, value)
+            new_hash.next = hash_[index] 
+            hash_[index] = new_hash
         else:
-            self.storage[index] = LinkedPair(key,value)
+            hash_[index] = LinkedPair(key,value)
+        return
+
+# the hash MVP:
+        # index = self._hash_mod(key)
+
+        # if self.storage[index] is not None:
+        #     print('key in user')
+        #     node = self.storage[index]
+        #     while node.next:
+        #         node = node.next
+
+        #     node.next = LinkedPair(key,value)
+        # else:
+        #     self.storage[index] = LinkedPair(key,value)
 
     def remove(self, key):
         '''
@@ -78,10 +89,23 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is None:
-            self.storage[index] = None
-        else:
+        cur = self.storage[index]
+
+        if cur.key == key:
+            self.storage[index] = cur.next
+        if cur.key != key:
+            while cur.next is not None:
+                next = cur.next
+                if next.key == key:
+                    cur.next = next.next
             print("Warning: Key does not exist")
+
+# the hash MVP:
+        # index = self._hash_mod(key)
+        # if self.storage[index] is None:
+        #     self.storage[index] = None
+        # else:
+        #     print("Warning: Key does not exist")
 
     def retrieve(self, key):
         '''
@@ -92,46 +116,62 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            return self.storage[index]
+        cur = self.storage[index]
+
+        if cur is not None:
+            while cur:
+                if cur.key is key:
+                    return cur.value
+                elif cur.next is not None:
+                    cur = cur.next
         else:
             return None
-
-    # def resize(self):
-    #     '''
-    #     Doubles the capacity of the hash table and
-    #     rehash all key/value pairs.
-
-    #     Fill this in.
-    #     '''
-    #     self.capacity *= 2
-    #     new_storage = [None] * self.capacity 
-
-    #     for bucket_item in self.storage:
-    #         if bucket_item is not None:
-    #             new_index = self._hash_mod(bucket_item.key)
-    #             new_storage[new_index] = LinkedPair(bucket_item.key, bucket_item.value)
-
-    #     self.storage = new_storage
-
+# the hash MVP:
+        # index = self._hash_mod(key)
+        # if self.storage[index] is not None:
+        #     return self.storage[index]
+        # else:
+        #     return None
 
     def resize(self):
         '''
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
+
         Fill this in.
         '''
-        #double capacity
-        self.capacity *=2
-        #store out storage before we nullify it
         old_storage = self.storage
-        self.storage = None
-        #re-fit our storage to hold out capacity
+        self.capacity *= 2
         self.storage = [None] * self.capacity
+        current = None
+        for i in old_storage:
+            current = i
+            while current:
+                self.insert(current.key, current.value)
+                current = current.next
+# the hash MVP:
+        # #double capacity
+        # self.capacity *=2
+        # #store out storage before we nullify it
+        # old_storage = self.storage
+        # self.storage = None
+        # #re-fit our storage to hold out capacity
+        # self.storage = [None] * self.capacity
 
-        for item in old_storage:
-            #must hash on insert, so instead of assigning item=item you gotta insert it
-            self.insert(item.key, item.value)
+        # for item in old_storage:
+        #     #must hash on insert, so instead of assigning item=item you gotta insert it
+        #     self.insert(item.key, item.value)
+
+        # self.capacity *= 2
+        # new_storage = [None] * self.capacity 
+
+        # for bucket_item in self.storage:
+        #     if bucket_item is not None:
+        #         new_index = self._hash_mod(bucket_item.key)
+        #         new_storage[new_index] = LinkedPair(bucket_item.key, bucket_item.value)
+
+        # self.storage = new_storage
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -160,6 +200,8 @@ if __name__ == "__main__":
     print(ht.retrieve("line_3"))
 
     print("")
+
+# Lecture notes:
 # class LinkedPair:
 #     def __init__(self, key, value):
 #         self.key = key
